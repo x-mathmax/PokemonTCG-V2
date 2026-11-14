@@ -1,0 +1,28 @@
+[
+  {
+    "id": "card-001",
+    "name": "Charizard ex",
+    "set_name": "Obsidian Flames",
+    "rarity": "Hyper Rare",
+    "type": "Fire",
+    "estimated_price": 85.5,
+    "counter_cards": [
+      "Starmie ex",
+      "Blastoise ex"
+    ],
+    "counter_notes": "Débil contra ataques tipo Agua de alto impacto visual y bajo costo de energía."
+  },
+  {
+    "id": "card-002",
+    "name": "Gardevoir ex",
+    "set_name": "Scarlet & Violet",
+    "rarity": "Special Illustration Rare",
+    "type": "Psychic",
+    "estimated_price": 28.0,
+    "counter_cards": [
+      "Darkrai VSTAR",
+      "Gengar ex"
+    ],
+    "counter_notes": "Sufre ante mazos agresivos de tipo Oscuro."
+  }
+]

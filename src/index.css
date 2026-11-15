@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #F0F4F8;
+    color: #0F172A;
+  }
+}
+
+/* Tipografía estilo Logo Pokémon con contorno azul clásico */
+.font-pokemon {
+  font-family: 'Luckiest Guy', cursive;
+  letter-spacing: 0.04em;
+}
+
+.pokemon-title {
+  font-family: 'Luckiest Guy', cursive;
+  color: #FFCB05;
+  letter-spacing: 0.05em;
+  text-shadow:
+    -1.5px -1.5px 0 #1D4ED8,
+     1.5px -1.5px 0 #1D4ED8,
+    -1.5px  1.5px 0 #1D4ED8,
+     1.5px  1.5px 0 #1D4ED8,
+     0px    3px   0 #0B2545;
+}
+
+.pokemon-subtitle-dark {
+  font-family: 'Luckiest Guy', cursive;
+  color: #134074;
+  letter-spacing: 0.03em;
+}
+
+/* Scrollbar personalizado azul y amarillo */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #E2E8F0;
+}
+::-webkit-scrollbar-thumb {
+  background: #134074;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #FFCB05;
+}

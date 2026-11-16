@@ -1,0 +1,231 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbot-counters",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ecb14991-ba21-4824-9eeb-1ddb6c6cb166",
+      "name": "Webhook Consulta",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -512,
+        -80
+      ],
+      "webhookId": "f53ffc50-5a6d-4171-a4d3-29c12d93e252"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-query",
+              "leftValue": "={{ $json.body.query }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "176a7cec-065a-4940-96d6-dc4902f0a035",
+      "name": "IF Consulta Valida",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.query }}",
+        "options": {
+          "systemMessage": "Sos un experto competitivo en Pokémon TCG y asistente de inventario.\n\nHERRAMIENTAS DISPONIBLES:\n`Consultar_Inventario`: Devuelve el listado real de cartas Pokémon que el usuario tiene guardadas actualmente en su colección (nombre, set_name, tipo, rareza, precio y counters). Usala siempre que pregunten por sus cartas, colecciones o inventario.\n\nREGLAS DE CONVERSACIÓN:\nSi el usuario saluda con \"hola\", respondé cordialmente con \"Hola Pokeamigo, ¿En qué puedo ayudarte hoy?\". Si no saluda, respondé directo lo solicitado en español (máximo 3 oraciones).\nEscribí tu respuesta en texto plano normal, sin formato especial.\nAl final de tu respuesta, en una línea nueva, escribí exactamente: COUNTERS: seguido de 2 a 4 cartas counter separadas por coma (o COUNTERS: ninguno si no aplica).\n"
+        }
+      },
+      "id": "33bae234-6c72-49a1-ac40-0542cb432b99",
+      "name": "AI Agent Estratega TCG",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -48,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "id": "69c1744a-ee83-490d-8fed-9dfe7b45fe53",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        48
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "Lwo260U4jyF2AKNy",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = ($input.first().json.output || '').trim();\n\nconst parts = raw.split(/COUNTERS:/i);\nconst replyText = parts[0].trim() || 'No se pudo generar una respuesta.';\n\nlet counters = [];\nif (parts[1] && !/ninguno/i.test(parts[1])) {\n  counters = parts[1]\n    .split(',')\n    .map(c => c.trim().replace(/\\.$/, ''))\n    .filter(c => c.length > 0);\n}\n\nreturn [{\n  json: {\n    reply: replyText,\n    suggested_counters: counters\n  }\n}];"
+      },
+      "id": "1c0dab77-4746-4a9d-b178-7c95752fcb14",
+      "name": "Formatear Respuesta JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "1711f856-17c5-462a-ba4d-11bf8bdd99a7",
+      "name": "Responder a FastAPI",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"reply\": \"Por favor ingresá una consulta válida sobre una carta o mazo.\", \"suggested_counters\": []}",
+        "options": {}
+      },
+      "id": "5bd75511-3d33-4a7d-a02a-58fe3a429be3",
+      "name": "Responder Error Vacio",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "toolDescription": "Obtiene la lista completa de cartas Pokemon que el usuario tiene guardadas actualmente en su inventario, con su tipo, rareza y counters.",
+        "url": "http://backend:8000/cards",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.5,
+      "position": [
+        112,
+        32
+      ],
+      "id": "6c47f740-e934-4ba7-af01-b1008a369d61",
+      "name": "Consultar_Inventario"
+    }
+  ],
+  "connections": {
+    "Webhook Consulta": {
+      "main": [
+        [
+          {
+            "node": "IF Consulta Valida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Consulta Valida": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Estratega TCG",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder Error Vacio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Estratega TCG": {
+      "main": [
+        [
+          {
+            "node": "Formatear Respuesta JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Estratega TCG",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Respuesta JSON": {
+      "main": [
+        [
+          {
+            "node": "Responder a FastAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar_Inventario": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent Estratega TCG",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5d77b519fe48981ea83462715f411007d4d76b200bfbec281e4b394f27d41463"
+  }
+}

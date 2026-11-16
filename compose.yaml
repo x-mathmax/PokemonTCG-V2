@@ -1,0 +1,34 @@
+services:
+  backend:
+    build: .
+    container_name: pokemontcg-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - N8N_CHATBOT_WEBHOOK_URL=http://n8n:5678/webhook/chatbot-counters
+      - N8N_REPORT_WEBHOOK_URL=http://n8n:5678/webhook/generar-reporte
+      - N8N_TELEGRAM_WEBHOOK_URL=http://n8n:5678/webhook/alerta-carta-valiosa
+    depends_on:
+      - n8n
+    restart: unless-stopped
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: pokemontcg-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=America/Argentina/Buenos_Aires
+      - TZ=America/Argentina/Buenos_Aires
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
+volumes:
+  n8n_data:

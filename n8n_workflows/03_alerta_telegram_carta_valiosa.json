@@ -1,0 +1,133 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alerta-carta-valiosa",
+        "options": {}
+      },
+      "id": "529f9833-d7c3-4dda-849f-4a2b43af778a",
+      "name": "Webhook Nueva Carta",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        -16
+      ],
+      "webhookId": "d05e4301-09ac-4952-9510-00f098f48dc9"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-price",
+              "leftValue": "={{ Number($json.body.estimated_price) }}",
+              "rightValue": 50,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "cond-rarity",
+              "leftValue": "={{ $json.body.rarity }}",
+              "rightValue": "Rare",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "4a92e228-9852-4a2c-a2d7-1f613bdc63cc",
+      "name": "IF Precio >= 50 o Rareza Alta",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "9074547817",
+        "text": "=🚨 *¡NUEVA CARTA VALIOSA REGISTRADA!* 🚨\n\n🃏 *Carta:* {{ $json.body.name }}\n📦 *Set:* {{ $json.body.set_name }}\n✨ *Rareza:* {{ $json.body.rarity }} ({{ $json.body.type }})\n💰 *Valuación:* ${{ $json.body.estimated_price }} USD\n🛡️ *Counters:* {{ $json.body.counter_cards.join(', ') || 'Sin registrar' }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "398ce792-bc12-46ac-b3d4-160d43a14613",
+      "name": "Enviar Alerta Telegram",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        -112
+      ],
+      "webhookId": "ba6c2fa1-95a8-4e19-a56b-d5c5a80c97cb",
+      "credentials": {
+        "telegramApi": {
+          "id": "cpumxWSbASGJsm3i",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "1ebe1c45-8e3b-47e7-b95b-5dddef30ea57",
+      "name": "Carta Estandar (Sin Alerta)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        256,
+        112
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Nueva Carta": {
+      "main": [
+        [
+          {
+            "node": "IF Precio >= 50 o Rareza Alta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Precio >= 50 o Rareza Alta": {
+      "main": [
+        [
+          {
+            "node": "Enviar Alerta Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Carta Estandar (Sin Alerta)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5d77b519fe48981ea83462715f411007d4d76b200bfbec281e4b394f27d41463"
+  }
+}

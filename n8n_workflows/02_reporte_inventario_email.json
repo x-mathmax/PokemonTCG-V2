@@ -1,0 +1,175 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generar-reporte",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "36ef3e82-db15-498e-bb59-597eb8ddaeb0",
+      "name": "Webhook Reporte",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        -16
+      ],
+      "webhookId": "f0fc3cd5-40a6-45b3-a865-13618b4c32f6"
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8000/cards",
+        "options": {}
+      },
+      "id": "3302b76d-1461-4424-92a3-ea0c25017f53",
+      "name": "Consultar Cartas FastAPI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -224,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-has-cards",
+              "leftValue": "={{ $('Webhook Reporte').first().json.body.summary.total_cards }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "9cb18763-b379-4e2c-b903-ef4295bedb8a",
+      "name": "IF Hay Cartas en Inventario",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        0,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookData = $('Webhook Reporte').first().json.body;\nconst cards = $input.all().map(item => item.json);\nconst summary = webhookData.summary;\n\nconst rows = cards.map(c => `\n  <tr>\n    <td style=\"padding:8px;border-bottom:1px solid #ddd;\"><strong>${c.name}</strong></td>\n    <td style=\"padding:8px;border-bottom:1px solid #ddd;\">${c.set_name}</td>\n    <td style=\"padding:8px;border-bottom:1px solid #ddd;\">${c.rarity}</td>\n    <td style=\"padding:8px;border-bottom:1px solid #ddd;\">$${Number(c.estimated_price).toFixed(2)}</td>\n  </tr>\n`).join('');\n\nconst html = `\n  <div style=\"font-family:Arial,sans-serif;max-width:600px;margin:auto;border:2px solid #134074;border-radius:12px;overflow:hidden;\">\n    <div style=\"background:#0B2545;color:#FFCB05;padding:16px;text-align:center;\">\n      <h2 style=\"margin:0;\">Reporte de Inventario Pokémon TCG</h2>\n    </div>\n    <div style=\"padding:20px;\">\n      <p><strong>Total de cartas:</strong> ${summary.total_cards}</p>\n      <p><strong>Valuación Total:</strong> $${Number(summary.total_valuation_usd).toFixed(2)} USD</p>\n      <p><strong>Carta más valiosa:</strong> ${summary.most_expensive_card?.name || 'N/A'} ($${summary.most_expensive_card?.estimated_price || 0})</p>\n      <table style=\"width:100%;border-collapse:collapse;margin-top:16px;\">\n        <thead>\n          <tr style=\"background:#F0F4F8;text-align:left;\">\n            <th style=\"padding:8px;\">Carta</th>\n            <th style=\"padding:8px;\">Set</th>\n            <th style=\"padding:8px;\">Rareza</th>\n            <th style=\"padding:8px;\">Precio</th>\n          </tr>\n        </thead>\n        <tbody>${rows}</tbody>\n      </table>\n    </div>\n  </div>\n`;\n\nreturn [{ json: { to: webhookData.destination_email, subject: `Reporte TCG Vault - Valuación Total: $${summary.total_valuation_usd} USD`, html } }];"
+      },
+      "id": "8f888c1f-1f98-4068-ba2d-fdf99f3ea35e",
+      "name": "Armar HTML del Reporte",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "3c96354a-a446-469e-adcf-6e4f9f924a3b",
+      "name": "Enviar Reporte Gmail",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        -112
+      ],
+      "webhookId": "16c82511-ef86-41fd-bcca-de97ec7c4386",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "4W5JIVJNbeLFw0Wq",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { status: 'skipped', reason: 'Inventario vacío, no se envió correo.' } }];"
+      },
+      "id": "e03e9987-e8bb-4d04-aa85-ab31741488e6",
+      "name": "Ignorar Inventario Vacio",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        112
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Reporte": {
+      "main": [
+        [
+          {
+            "node": "Consultar Cartas FastAPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Cartas FastAPI": {
+      "main": [
+        [
+          {
+            "node": "IF Hay Cartas en Inventario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Hay Cartas en Inventario": {
+      "main": [
+        [
+          {
+            "node": "Armar HTML del Reporte",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ignorar Inventario Vacio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Armar HTML del Reporte": {
+      "main": [
+        [
+          {
+            "node": "Enviar Reporte Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5d77b519fe48981ea83462715f411007d4d76b200bfbec281e4b394f27d41463"
+  }
+}

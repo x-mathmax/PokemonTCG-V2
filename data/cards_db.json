@@ -24,5 +24,19 @@
       "Gengar ex"
     ],
     "counter_notes": "Sufre ante mazos agresivos de tipo Oscuro."
+  },
+  {
+    "name": "Umbreon VMAX",
+    "set_name": "Evolving Skies",
+    "rarity": "Secret Rare",
+    "type": "Darkness",
+    "estimated_price": 120.0,
+    "counter_cards": [
+      "Urshifu VMAX",
+      "Lucario VSTAR",
+      "Buzzwole GX"
+    ],
+    "counter_notes": "Débil contra ataques tipo Lucha (x2). Conviene presionarlo antes de que evolucione desde Umbreon V o bloquear su habilidad Dark Signal con Path to the Peak.",
+    "id": "card-927857"
   }
 ]

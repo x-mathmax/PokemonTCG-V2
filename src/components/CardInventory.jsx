@@ -11,6 +11,7 @@ export default function CardInventory({
   typeFilter,
   onRarityChange,
   onTypeChange,
+  onDelete,
 }) {
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#E3B6B9]/40">
@@ -56,7 +57,7 @@ export default function CardInventory({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {cards.map((card) => (
-            <PokemonCardItem key={card.id} card={card} />
+            <PokemonCardItem key={card.id} card={card} onDelete={onDelete} />
           ))}
         </div>
       )}

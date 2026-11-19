@@ -49,6 +49,17 @@ export default function App() {
     setTimeout(() => setToast(''), 5000);
   };
 
+  const handleCardDeleted = async (cardId, cardName) => {
+    try {
+      await api.deleteCard(cardId);
+      setToast(`Carta "${cardName}" eliminada de tu colección.`);
+      setTimeout(() => setToast(''), 4000);
+      fetchData();
+    } catch (err) {
+      setError(`Error al eliminar la carta: ${err.message}`);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col pb-24 bg-[#F0F4F8]">
       {/* Navbar estilo Reverso Pokémon (Azul Marino + Borde Amarillo) */}
@@ -123,6 +134,7 @@ export default function App() {
           typeFilter={typeFilter}
           onRarityChange={setRarityFilter}
           onTypeChange={setTypeFilter}
+          onDelete={handleCardDeleted}
         />
       </main>
 

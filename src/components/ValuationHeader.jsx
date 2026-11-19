@@ -68,35 +68,37 @@ export default function ValuationHeader({ valuation, onError }) {
         </div>
 
         {/* Disparador de Reporte n8n */}
-        <form onSubmit={handleSendReport} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          <div className="relative">
-            <Mail className="w-4 h-4 text-[#134074] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="tu@email.com para reporte..."
-              className="pl-9 pr-3 py-2.5 text-xs bg-[#F0F4F8] border border-slate-200 rounded-xl focus:outline-none focus:border-[#134074] w-full sm:w-60"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={sending}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-[#DC2626] hover:bg-[#b91c1c] rounded-xl transition cursor-pointer disabled:opacity-50 shadow-xs"
-          >
-            <Send className="w-3.5 h-3.5" />
-            {sending ? 'Enviando...' : 'Reporte Email'}
-          </button>
-        </form>
-      </div>
+        <div className="flex flex-col sm:items-end shrink-0">
+          <form onSubmit={handleSendReport} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <div className="relative">
+              <Mail className="w-4 h-4 text-[#134074] absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="tu@email.com para reporte..."
+                className="pl-9 pr-3 py-2.5 text-xs bg-[#F0F4F8] border border-slate-200 rounded-xl focus:outline-none focus:border-[#134074] w-full sm:w-60"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={sending}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-[#DC2626] hover:bg-[#b91c1c] rounded-xl transition cursor-pointer disabled:opacity-50 shadow-xs"
+            >
+              <Send className="w-3.5 h-3.5" />
+              {sending ? 'Enviando...' : 'Reporte Email'}
+            </button>
+          </form>
 
-      {sentMessage && (
-        <div className="mt-3 flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg">
-          <CheckCircle2 className="w-4 h-4" />
-          <span>{sentMessage}</span>
+          {sentMessage && (
+            <div className="mt-2.5 flex items-center gap-2 text-xs text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg border border-emerald-200 shadow-xs self-stretch sm:self-end">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>{sentMessage}</span>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

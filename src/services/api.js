@@ -35,6 +35,22 @@ export const api = {
     return handleResponse(res);
   },
 
+  // GET /cards/search-external?query=...
+  searchExternalCards: async (query) => {
+    const res = await fetch(
+      `${API_BASE_URL}/cards/search-external?query=${encodeURIComponent(query)}`
+    );
+    return handleResponse(res);
+  },
+
+  // DELETE /cards/:cardId
+  deleteCard: async (cardId) => {
+    const res = await fetch(`${API_BASE_URL}/cards/${cardId}`, {
+      method: 'DELETE',
+    });
+    return handleResponse(res);
+  },
+
   // POST /automated/chatbot
   sendChatQuery: async (query) => {
     const res = await fetch(`${API_BASE_URL}/automated/chatbot`, {

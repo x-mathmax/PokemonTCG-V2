@@ -76,3 +76,12 @@ async def create_card(card_data: CardCreate, background_tasks: BackgroundTasks):
     new_card = database.add_card(card_data)
     background_tasks.add_task(notify_valuable_card, new_card)
     return new_card
+
+# Endpoint 6: DELETE /cards/{card_id}
+@router.delete("/{card_id}", status_code=status.HTTP_200_OK)
+def delete_card(card_id: str):
+    """Elimina una carta del inventario por su ID."""
+    success = database.delete_card(card_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Carta no encontrada para eliminar")
+    return {"message": "Carta eliminada exitosamente", "card_id": card_id}

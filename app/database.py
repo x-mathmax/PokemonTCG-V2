@@ -42,3 +42,13 @@ def add_card(card_data: CardCreate) -> dict:
     cards.append(new_card)
     save_cards(cards)
     return new_card
+
+def delete_card(card_id: str) -> bool:
+    cards = load_cards()
+    initial_len = len(cards)
+    cards = [c for c in cards if c.get("id") != card_id]
+   
+    if len(cards) < initial_len:
+        save_cards(cards)
+        return True
+    return False

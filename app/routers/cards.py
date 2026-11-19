@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks, status
+from fastapi import APIRouter, HTTPException, BackgroundTasks, status, Query
 from typing import List, Optional
 from app.models import CardCreate, CardResponse, ValuationSummary
 from app import database
 from app.services.n8n_client import notify_valuable_card
+from app.services.tcg_api import fetch_card_image, search_tcg_cards
 
 router = APIRouter(prefix="/cards", tags=["Cartas e Inventario"])
 
@@ -46,7 +47,19 @@ def get_valuation():
         cards_by_rarity=by_rarity
     )
 
-# Endpoint 3: GET /cards/{card_id} (Detalle individual)
+# # Endpoint 3 :Busca cartas en la API externa de Pokémon TCG
+@router.get("/search-external")
+async def search_external_cards(
+    query: str = Query(
+        ...,
+        min_length=2,
+        description="Nombre de la carta a buscar",
+    ),
+):
+    results = await search_tcg_cards(query)
+    return results
+
+# Endpoint 4: GET /cards/{card_id} (Detalle individual)
 @router.get("/{card_id}", response_model=CardResponse)
 def get_card(card_id: str):
     card = database.get_card_by_id(card_id)
@@ -54,7 +67,7 @@ def get_card(card_id: str):
         raise HTTPException(status_code=404, detail="Carta no encontrada")
     return card
 
-# Endpoint 4: POST /cards (Agregar carta + webhook automático si es valiosa)
+# Endpoint 5: POST /cards (Agregar carta + webhook automático si es valiosa)
 @router.post("", response_model=CardResponse, status_code=status.HTTP_201_CREATED)
 async def create_card(card_data: CardCreate, background_tasks: BackgroundTasks):
     if not card_data.image_url:
@@ -63,3 +76,12 @@ async def create_card(card_data: CardCreate, background_tasks: BackgroundTasks):
     new_card = database.add_card(card_data)
     background_tasks.add_task(notify_valuable_card, new_card)
     return new_card
+
+# Endpoint 6: DELETE /cards/{card_id}
+@router.delete("/{card_id}", status_code=status.HTTP_200_OK)
+def delete_card(card_id: str):
+    """Elimina una carta del inventario por su ID."""
+    success = database.delete_card(card_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Carta no encontrada para eliminar")
+    return {"message": "Carta eliminada exitosamente", "card_id": card_id}

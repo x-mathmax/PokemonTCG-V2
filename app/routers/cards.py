@@ -56,8 +56,10 @@ def get_card(card_id: str):
 
 # Endpoint 4: POST /cards (Agregar carta + webhook automático si es valiosa)
 @router.post("", response_model=CardResponse, status_code=status.HTTP_201_CREATED)
-def create_card(card_data: CardCreate, background_tasks: BackgroundTasks):
+async def create_card(card_data: CardCreate, background_tasks: BackgroundTasks):
+    if not card_data.image_url:
+        card_data.image_url = await fetch_card_image(card_data.name)
+       
     new_card = database.add_card(card_data)
-    # Ejecuta el trigger a Telegram en segundo plano para no congelar la API
     background_tasks.add_task(notify_valuable_card, new_card)
     return new_card

@@ -5,11 +5,9 @@
     "set_name": "Obsidian Flames",
     "rarity": "Hyper Rare",
     "type": "Fire",
-    "estimated_price": 85.5,
-    "counter_cards": [
-      "Starmie ex",
-      "Blastoise ex"
-    ],
+    "estimated_price": 85.50,
+    "image_url": "https://images.pokemontcg.io/sv3/228.png",
+    "counter_cards": ["Starmie ex", "Blastoise ex"],
     "counter_notes": "Débil contra ataques tipo Agua de alto impacto visual y bajo costo de energía."
   },
   {
@@ -18,11 +16,9 @@
     "set_name": "Scarlet & Violet",
     "rarity": "Special Illustration Rare",
     "type": "Psychic",
-    "estimated_price": 28.0,
-    "counter_cards": [
-      "Darkrai VSTAR",
-      "Gengar ex"
-    ],
+    "estimated_price": 28.00,
+    "image_url": "https://images.pokemontcg.io/sv1/245.png",
+    "counter_cards": ["Darkrai VSTAR", "Gengar ex"],
     "counter_notes": "Sufre ante mazos agresivos de tipo Oscuro."
   },
   {

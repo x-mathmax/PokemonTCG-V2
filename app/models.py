@@ -7,6 +7,7 @@ class CardBase(BaseModel):
     rarity: str = Field(..., example="Hyper Rare")
     type: str = Field(..., example="Fire")
     estimated_price: float = Field(..., gt=0, example=85.50)
+    image_url: Optional[str] = Field(default=None, example="https://images.pokemontcg.io/sv3/223.png")
     counter_cards: List[str] = Field(default=[], example=["Starmie ex", "Blastoise ex"])
     counter_notes: Optional[str] = Field(default="", example="Vulnerable a ataques tipo agua rápidos.")
 

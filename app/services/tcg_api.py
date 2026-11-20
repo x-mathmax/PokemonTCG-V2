@@ -49,7 +49,7 @@ def _extract_price(card: Dict[str, Any]) -> float:
 
 async def search_tcg_cards(
     query: str,
-    page_size: int = 8,
+    page_size: int = 9,
 ) -> List[Dict[str, Any]]:
     """Busca cartas por nombre en la API pública de Pokémon TCG."""
     if not query or not query.strip():
